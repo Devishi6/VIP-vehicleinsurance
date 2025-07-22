@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vehicle Insurance - Claim Request</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+      body {
+        background: #eef2f7;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 60px 20px;
+      }
+      .btndiv {
+        max-width: 400px;
+        margin: 0 auto;
+        text-align: center;
+        background: white;
+        padding: 40px 20px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      }
+      button {
+        width: 160px;
+        margin: 15px 10px;
+        font-weight: 600;
+        font-size: 1.2rem;
+        border-radius: 10px;
+        padding: 12px 0;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 6px rgba(0,123,255,0.3);
+      }
+      button.btn-outline-primary {
+        color: #007bff;
+        border: 2px solid #007bff;
+        background: transparent;
+      }
+      button.btn-outline-primary:hover {
+        background-color: #007bff;
+        color: white;
+        box-shadow: 0 8px 15px rgba(0,123,255,0.5);
+        transform: translateY(-3px);
+      }
+      #content {
+        margin-top: 40px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 30px 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        min-height: 500px;
+      }
+    </style>
+</head>
+<body>
+  <div class="btndiv">
+    <button onclick="requestform()" class="btn btn-outline-primary">Claim Request</button>
+    <button onclick="getstatus()" class="btn btn-outline-primary">Check Status</button>
+  </div>
+  
+  <div id="content"></div>
+
+  <script>
+    function requestform() {
+      fetch("claimrequestform.html")
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById("content").innerHTML = html;
+          // Attach submit event after loading form
+          let form = document.getElementById("claimForm");
+          form.onsubmit = function(event) {
+            event.preventDefault();
+            submitForm();
+          };
+        });
+    }
+
+    function submitForm() {
+      let form = document.getElementById('claimForm');
+
+      let obj = {
+        policyId: form.policyId.value,
+        userId: Number(form.userId.value),
+        name: form.name.value,
+        email: form.email.value,
+        vehicleType: form.vehicleType.value,
+        vehicleNo: form.vehicleNo.value,
+        aadhar: form.aadhar.value,
+        pan: form.pan.value,
+        reasonToClaim: form.reasonToClaim.value,
+        incidentDate: form.incidentDate.value,
+        description: form.description.value
+      };
+
+      fetch('/claims/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(obj)
+      })
+      .then(res => res.text())
+      .then(data => {
+        alert(data);            // Show alert with response message
+        document.getElementById('content').innerHTML = '';  // Clear form from page
+      })
+      .catch(() => {
+        alert("Something went wrong. Please try again.");
+		button.disabled = false;   // after clickimg submit 
+		button.innerText = "Submit Claim";
+      });
+    }
+	
+	function getstatus() {
+	  const content = document.getElementById('content');
+	  content.innerHTML = `
+	    <h4>Check Claim Status</h4>
+	    <input type="number" id="claimIdInput" class="form-control my-2" placeholder="Enter Claim ID" />
+	    <button onclick="checkStatus()" class="btn btn-primary mb-3">Search</button>
+	    <div id="statusDetails" style="margin-top: 15px; font-weight: 600;"></div>
+	  `;
+	}
+
+	function checkStatus() {
+	  const claimId = document.getElementById('claimIdInput').value.trim();
+	  if (!claimId) {
+	    alert('Please enter a Claim ID');
+	    return;
+	  }
+
+	  fetch(`/claims/status/${claimId}`)
+	    .then(response => {
+	      if (!response.ok) throw new Error('Claim ID not found');
+	      return response.json();  // parse JSON response
+	    })
+	    .then(claim => {
+	      const detailsDiv = document.getElementById('statusDetails');
+	      // Display all claim details nicely
+	      detailsDiv.innerHTML = `
+	        <p><strong>Claim ID:</strong> ${claim.claimId}</p>
+	        <p><strong>Policy ID:</strong> ${claim.policyId}</p>
+	        <p><strong>User ID:</strong> ${claim.userId}</p>
+	        <p><strong>Name:</strong> ${claim.name}</p>
+	        <p><strong>Email:</strong> ${claim.email}</p>
+	        <p><strong>Vehicle Type:</strong> ${claim.vehicleType}</p>
+	        <p><strong>Vehicle No:</strong> ${claim.vehicleNo}</p>
+	        <p><strong>Aadhar:</strong> ${claim.aadhar}</p>
+	        <p><strong>PAN:</strong> ${claim.pan}</p>
+	        <p><strong>Reason to Claim:</strong> ${claim.reasonToClaim}</p>
+	        <p><strong>Incident Date:</strong> ${claim.incidentDate}</p>
+	        <p><strong>Description:</strong> ${claim.description}</p>
+	        <p><strong>Status:</strong> ${claim.status}</p>
+	        <p><strong>Remarks:</strong> ${claim.remarks ? claim.remarks : 'None'}</p>
+	      `;
+	    })
+	    .catch(err => {
+	      document.getElementById('statusDetails').innerText = err.message;
+	    });
+	}
+
+
+  </script>
+</body>
+</html>

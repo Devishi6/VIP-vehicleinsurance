@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add New Policy</title>
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    /* Container */
+    .form-container {
+      background: #fff;
+      padding: 40px 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 420px;
+      transition: box-shadow 0.3s ease;
+    }
+    .form-container:hover {
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      color: #2c3e50;
+      letter-spacing: 1.2px;
+      font-size: 2.2rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #3949ab;
+      font-size: 1rem;
+      user-select: none;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 1rem;
+      border: 2px solid #ccd6f6;
+      border-radius: 10px;
+      background-color: #f9fbff;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #3949ab;
+      background-color: #fff;
+      box-shadow: 0 0 10px #3949ab77;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #28a745, #1e7e34);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(40, 167, 69, 0.5);
+      transition: background 0.3s ease, transform 0.2s ease;
+      user-select: none;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #1e7e34, #145214);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 25px rgba(40, 167, 69, 0.7);
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .form-container {
+        padding: 30px 20px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h1>Add New Policy</h1>
+    <form id="policyForm" onsubmit="submitPolicy(event)">
+
+      <label for="policyname">Policy Name</label>
+      <input type="text" id="policyname" name="policyname" placeholder="Enter policy name" required />
+
+      <label for="vehicleType">Vehicle Type</label>
+      <input type="text" id="vehicleType" name="vehicleType" placeholder="Enter vehicle type" required />
+
+      <label for="year">Year</label>
+      <input type="text" id="year" name="year" placeholder="Enter year" required />
+
+      <label for="month">Month</label>
+      <input type="number" name="month" min="1" max="12" placeholder="Enter month" />
+
+      <label for="premiumamount">Premium Amount</label>
+      <input type="number" id="premiumamount" name="premiumamount" placeholder="Enter premium amount" required />
+
+      <label for="tenureInMonths">Tenure (Months)</label>
+      <input type="number" id="tenureInMonths" name="tenureInMonths" placeholder="Enter tenure in months" required />
+
+      <label for="description">Description</label>
+      <input type="text" id="description" name="description" placeholder="Enter description" required/>
+
+      <label for="status">Policy Status</label>
+      <select id="status" name="status" required>
+        <option value="" disabled selected>Select status</option>
+        <option value="Available">Available</option>
+        <option value="Pending">Pending</option>
+        <option value="Expired">Expired</option>
+      </select>
+
+      <label for="policyDocumentPath">Policy Document Path (Optional)</label>
+      <input type="text" id="policyDocumentPath" name="policyDocumentPath(Optional)" placeholder="Enter document path" />
+
+      <button type="submit">Create Policy</button>
+    </form>
+  </div>
+
+  <script>
+    async function submitPolicy(event) {
+      event.preventDefault();
+
+      const policy = {
+        policyname: document.getElementById('policyname').value,
+        vehicleType: document.getElementById('vehicleType').value,
+        year: document.getElementById('year').value,
+        month: document.getElementById('month').value,
+        premiumamount: parseFloat(document.getElementById('premiumamount').value),
+        tenureInMonths: parseInt(document.getElementById('tenureInMonths').value),
+        description: document.getElementById('description').value,
+        status: document.getElementById('status').value,
+        policyDocumentPath: document.getElementById('policyDocumentPath').value
+      };
+
+      const response = await fetch('policies/policycreation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(policy)
+      });
+
+      if (response.ok) {
+        alert('Policy Created Successfully!');
+        document.getElementById('policyForm').reset();
+        // Redirect after creation
+        window.location.href = "admin-policies.html"; // or wherever you want
+      } else {
+        alert('Failed to create policy.');
+      }
+    }
+  </script>
+</body>
+</html>

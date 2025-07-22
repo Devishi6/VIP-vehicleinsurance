@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login</title>
+  <style>
+	body {
+	      margin: 0;
+	      padding: 0;
+	      height: 100vh;
+	      font-family: Arial, sans-serif;
+	      background: linear-gradient(135deg, #2c3e50, #3498db);
+	      display: flex;
+	      justify-content: center;
+	      align-items: center;
+	    }
+
+	    /* Login box */
+	    .container {
+	      background: #fff;
+	      padding: 30px 25px;
+	      border-radius: 10px;
+	      width: 320px;
+	      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+	      text-align: center;
+	    }
+
+	    /* Heading */
+	    .container h2 {
+	      margin-bottom: 25px;
+	      color: #2c3e50;
+	      font-weight: bold;
+	      font-size: 24px;
+	      letter-spacing: 1px;
+	    }
+
+	    /* Inputs */
+	    input {
+	      width: 75%;
+	      padding: 10px 14px;
+	      margin: 12px 0;
+	      border: 1.5px solid #ccc;
+	      border-radius: 6px;
+	      font-size: 15px;
+	      transition: border-color 0.3s ease;
+	    }
+
+	    input:focus {
+	      border-color: #3498db;
+	      outline: none;
+	      box-shadow: 0 0 5px #3498db;
+	    }
+
+	    /* Button */
+	    button {
+	      width: 100%;
+	      padding: 12px;
+	      margin-top: 15px;
+	      background-color: #3498db;
+	      border: none;
+	      border-radius: 6px;
+	      font-size: 16px;
+	      font-weight: bold;
+	      color: white;
+	      cursor: pointer;
+	      transition: background-color 0.3s ease;
+	    }
+
+	    button:hover {
+	      background-color: #2980b9;
+	    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Admin Login</h2>
+    <input type="email" id="email" placeholder="Admin Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button onclick="adminLogin()">Log in</button>
+  </div>
+
+  <script>
+	function adminLogin() {
+	    const email = document.getElementById("email").value;
+	    const password = document.getElementById("password").value;
+
+	    fetch("/api/admin/login", {
+	        method: "POST",
+	        headers: {
+	            "Content-Type": "application/json"
+	        },
+	        body: JSON.stringify({ email, password })
+	    })
+	    .then(res => res.text())
+	    .then(data => {
+	        if (data.includes("successful")) {
+	            window.top.location.href = "admin-dashboard.html";
+	        }
+	    })
+	    .catch(() => alert("Admin login failed"));
+	}
+  </script>
+
+</body>
+</html>

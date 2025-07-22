@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>My Policies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f4f6f8;
+        }
+        h2 {
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            margin-top: 20px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #00796b;
+            color: white;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .message {
+            color: #333;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>My Policies</h2>
+    <div id="result"></div>
+
+    <script>
+        const email = sessionStorage.getItem("userEmail");
+
+        if (!email) {
+            document.getElementById('result').innerHTML = "<p class='error'>You are not logged in properly. Please login again.</p>";
+        } else {
+			fetch(`/customer/getbyemail/${email}`)
+			  .then(response => {
+			    if (!response.ok) throw new Error('No policies found with this email');
+			    return response.json();
+			  })
+			  .then(customers => {
+			    if (!customers || customers.length === 0) {
+			      document.getElementById('result').innerHTML = '<p class="message">No policies found.</p>';
+			      return;
+			    }
+
+			    let tableHTML = `<table>
+			      <thead>
+			        <tr>
+			          <th>User ID</th>
+			          <th>Name</th>
+			          <th>Policy ID</th>
+			          <th>Status</th>
+			        </tr>
+			      </thead>
+			      <tbody>`;
+
+			    customers.forEach(customer => {
+			      tableHTML += `
+			        <tr>
+			          <td>${customer.userId}</td>
+			          <td>${customer.name}</td>
+			          <td>${customer.policyId}</td>
+			          <td>${customer.status}</td>
+			        </tr>
+			      `;
+			    });
+
+			    tableHTML += '</tbody></table>';
+
+			    document.getElementById('result').innerHTML = tableHTML;
+			  })
+			  .catch(err => {
+			    document.getElementById('result').innerHTML = `<p class="error">${err.message}</p>`;
+			  });
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Customer Policy Requests - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="admin-policyrequest.css" />
+
+</head>
+<body>
+
+<h2>Policy Requests - Admin</h2>
+
+<table id="customerTable" class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>User ID</th><th>Name</th><th>Age</th><th>Gender</th><th>Address</th><th>State</th><th>Pincode</th>
+            <th>Email</th><th>Phone</th><th>Aadhar</th><th>PAN</th><th>Vehicle No.</th><th>Vehicle Type</th>
+            <th>Year</th><th>Month</th><th>DOB</th><th>Policy ID</th><th>Status</th><th>Actions</th>
+        </tr>
+    </thead>
+    <tbody><!-- Data will go here --></tbody>
+</table>
+
+<!-- Update Modal -->
+<div id="updateModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">Update Customer</div>
+        <form id="updateForm">
+            <input type="hidden" id="userId" name="userId" />
+            <label for="name">Name</label><input type="text" id="name" name="name" required />
+            <label for="age">Age</label><input type="number" id="age" name="age" min="18" required />
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+                <option value="">--Select--</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <label for="address">Address</label><input type="text" id="address" name="address" required />
+            <label for="state">State</label><input type="text" id="state" name="state" required />
+            <label for="pincode">Pincode</label><input type="text" id="pincode" name="pincode" pattern="[0-9]{6}" title="6 digit pincode" required />
+            <label for="email">Email</label><input type="email" id="email" name="email" required />
+            <label for="phone">Phone Number</label><input type="text" id="phone" name="phone" pattern="[0-9]{10}" title="10 digit phone number" required />
+            <label for="aadhar">Aadhar</label><input type="text" id="aadhar" name="aadhar" required />
+            <label for="pan">PAN</label><input type="text" id="pan" name="pan" required />
+            <label for="vehicleNumber">Vehicle Number</label><input type="text" id="vehicleNumber" name="vehicleNumber" required />
+            <label for="vehicleType">Vehicle Type</label><input type="text" id="vehicleType" name="vehicleType" required />
+            <label for="vehiclePurchaseYear">Vehicle Purchase Year</label><input type="number" id="vehiclePurchaseYear" name="vehiclePurchaseYear" min="1900" required />
+            <label for="vehiclePurchaseMonth">Vehicle Purchase Month</label><input type="number" id="vehiclePurchaseMonth" name="vehiclePurchaseMonth" min="1" max="12" required />
+            <label for="dob">Date of Birth</label><input type="date" id="dob" name="dob" required />
+            <label for="policyId">Policy ID</label><input type="text" id="policyId" name="policyId" required />
+            <label for="status">Status</label>
+            <select id="status" name="status" required>
+                <option value="">--Select--</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Active">Active</option>
+            </select>
+            <div class="modal-footer">
+                <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('updateModal');
+    const form = document.getElementById('updateForm');
+
+    function loadCustomers() {
+        fetch('/customer/all')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector('#customerTable tbody');
+                tbody.innerHTML = '';
+                data.forEach(c => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${c.userId}</td><td>${c.name}</td><td>${c.age}</td><td>${c.gender}</td><td>${c.address}</td><td>${c.state}</td><td>${c.pincode}</td>
+                        <td>${c.email}</td><td>${c.phone}</td><td>${c.aadhar}</td><td>${c.pan}</td><td>${c.vehicleNumber}</td><td>${c.vehicleType}</td>
+                        <td>${c.vehiclePurchaseYear}</td><td>${c.vehiclePurchaseMonth}</td><td>${c.dob ? c.dob.split('T')[0] : ''}</td><td>${c.policyId}</td><td>${c.status}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="showUpdateModal(${c.userId})">Update</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteCustomer(${c.userId})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                console.error('Error loading customers:', err);
+                alert('Failed to load customer list.');
+            });
+    }
+
+    function deleteCustomer(id) {
+        if (confirm("Are you sure you want to delete this customer?")) {
+            fetch(`/customer/delete/${id}`,
+			 { method: 'DELETE' })
+                .then(res => {
+                    if (res.ok) {
+                        alert('Deleted successfully');
+                        loadCustomers();
+                    } else {
+                        alert('Delete failed');
+                    }
+                })
+                .catch(err => alert('Error deleting'));
+        }
+    }
+
+    function showUpdateModal(id) {
+        fetch(`/customer/update/${id}`)
+            .then(res => {
+                if (!res.ok) {
+                    console.error('Fetch failed with status:', res.status);
+                    throw new Error('Failed to fetch customer');
+                }
+                return res.json();
+            })
+            .then(c => {
+                form.userId.value = c.userId;
+                form.name.value = c.name;
+                form.age.value = c.age;
+                form.gender.value = c.gender;
+                form.address.value = c.address;
+                form.state.value = c.state;
+                form.pincode.value = c.pincode;
+                form.email.value = c.email;
+                form.phone.value = c.phone;
+                form.aadhar.value = c.aadhar;
+                form.pan.value = c.pan;
+                form.vehicleNumber.value = c.vehicleNumber;
+                form.vehicleType.value = c.vehicleType;
+                form.vehiclePurchaseYear.value = c.vehiclePurchaseYear;
+                form.vehiclePurchaseMonth.value = c.vehiclePurchaseMonth;
+                form.dob.value = c.dob ? c.dob.split('T')[0] : '';
+                form.policyId.value = c.policyId;
+                form.status.value = c.status;
+
+                modal.style.display = 'block';
+            })
+            .catch(err => {
+                console.error('Error loading customer:', err);
+                alert('Could not load customer details');
+            });
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const id = form.userId.value;
+        const updatedCustomer = {
+            userId: id,
+            name: form.name.value.trim(),
+            age: parseInt(form.age.value),
+            gender: form.gender.value,
+            address: form.address.value.trim(),
+            state: form.state.value.trim(),
+            pincode: form.pincode.value.trim(),
+            email: form.email.value.trim(),
+            phone: form.phone.value.trim(),
+            aadhar: form.aadhar.value.trim(),
+            pan: form.pan.value.trim(),
+            vehicleNumber: form.vehicleNumber.value.trim(),
+            vehicleType: form.vehicleType.value.trim(),
+            vehiclePurchaseYear: parseInt(form.vehiclePurchaseYear.value),
+            vehiclePurchaseMonth: parseInt(form.vehiclePurchaseMonth.value),
+            dob: form.dob.value,
+            policyId: form.policyId.value.trim(),
+            status: form.status.value
+        };
+
+        fetch(`/customer/update/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedCustomer)
+        })
+        .then(res => {
+            if (res.ok) {
+                alert('Customer updated successfully');
+                closeModal();
+                loadCustomers();
+            } else {
+                alert('Update failed');
+            }
+        })
+        .catch(err => {
+            console.error('Error updating customer:', err);
+            alert('Error updating customer');
+        });
+    });
+
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+
+    // Load customers on page load
+    loadCustomers();
+</script>
+
+</body>
+</html>

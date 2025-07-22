@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin - Manage Claims</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+	<style>
+	  body {
+	    background-color: #1e8449;
+	    padding: 40px;
+	    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	    color: #333;
+	  }
+
+	  .container {
+	    background: #fff;
+	    padding: 40px 30px 50px 30px;
+	    border-radius: 15px;
+	    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+	    max-width: 900px;
+	    margin: auto;
+	  }
+
+	  h4 {
+	    color: #2c3e50;
+	    font-weight: 700;
+	    margin-bottom: 25px;
+	    letter-spacing: 0.05em;
+	  }
+
+	  button {
+	    width: 170px;
+	    font-weight: 600;
+	    font-size: 1.1rem;
+	    padding: 12px 0;
+	    border-radius: 10px;
+	    box-shadow: 0 4px 12px rgba(41, 128, 185, 0.25);
+	    transition: all 0.3s ease;
+	    cursor: pointer;
+	  }
+
+	  button.btn-primary {
+	    background-color: #2980b9;
+	    border: none;
+	    color: white;
+	    margin-right: 15px;
+	  }
+
+	  button.btn-primary:hover {
+	    background-color: #1c5980;
+	    box-shadow: 0 6px 18px rgba(28, 89, 128, 0.5);
+	  }
+
+	  button.btn-warning {
+	    background-color: #f39c12;
+	    border: none;
+	    color: white;
+	  }
+
+	  button.btn-warning:hover {
+	    background-color: #d17e0a;
+	    box-shadow: 0 6px 18px rgba(209, 126, 10, 0.5);
+	  }
+
+	  table {
+	    background-color: white;
+	    border-collapse: separate;
+	    border-spacing: 0 10px;
+	    width: 100%;
+	    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+	    border-radius: 12px;
+	    overflow: hidden;
+	  }
+
+	  thead tr {
+	    background-color: #2980b9;
+	    color: white;
+	    text-transform: uppercase;
+	    letter-spacing: 0.07em;
+	    font-weight: 600;
+	  }
+
+	  th, td {
+	    padding: 14px 18px;
+	    text-align: left;
+	    vertical-align: middle;
+	  }
+
+	  tbody tr {
+	    background-color: #f7fbff;
+	    transition: background-color 0.3s ease;
+	    cursor: default;
+	  }
+
+	  tbody tr:hover {
+	    background-color: #d0e7ff;
+	  }
+
+	  #updateFormDiv {
+	    margin-top: 40px;
+	    padding: 25px 30px;
+	    background: #f1f6fb;
+	    border-radius: 15px;
+	    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+	  }
+
+	  #updateForm h5 {
+	    color: #34495e;
+	    margin-bottom: 25px;
+	    font-weight: 700;
+	    letter-spacing: 0.03em;
+	  }
+
+	  #updateForm input,
+	  #updateForm textarea {
+	    border-radius: 8px;
+	    border: 1.5px solid #d1d9e6;
+	    padding: 12px 15px;
+	    font-size: 1rem;
+	    margin-bottom: 18px;
+	    width: 100%;
+	    box-sizing: border-box;
+	    transition: border-color 0.3s ease;
+	  }
+
+	  #updateForm input:focus,
+	  #updateForm textarea:focus {
+	    border-color: #2980b9;
+	    outline: none;
+	  }
+
+	  #updateForm textarea {
+	    resize: vertical;
+	    min-height: 80px;
+	  }
+
+	  #updateForm button {
+	    width: 100%;
+	    background-color: #27ae60;
+	    border: none;
+	    color: white;
+	    font-size: 1.1rem;
+	    padding: 14px 0;
+	    border-radius: 10px;
+	    font-weight: 700;
+	    box-shadow: 0 5px 18px rgba(39, 174, 96, 0.4);
+	    cursor: pointer;
+	    transition: background-color 0.3s ease;
+	  }
+
+	  #updateForm button:hover {
+	    background-color: #1e8449;
+	  }
+	</style>
+</head>
+<body>
+
+<div class="container">
+    <h4 class="mb-4">Admin - Manage Claims</h4>
+
+    <div class="mb-3">
+        <button class="btn btn-primary me-3" onclick="loadAllClaims()">View All Claims</button>
+        <button class="btn btn-warning" onclick="promptUpdate()">Update Claim</button>
+    </div>
+    <div id="claimsTable"></div>
+    <div id="updateFormDiv"></div>
+</div>
+
+<script>
+function loadAllClaims() {
+    fetch('/claims/getclaims')
+    .then(res => res.json())
+    .then(data => {
+        let table = `<table class="table table-bordered table-striped">
+                        <thead><tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Reason</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                        </tr></thead><tbody>`;
+        data.forEach(claim => {
+            table += `<tr>
+                        <td>${claim.claimId}</td>
+                        <td>${claim.name}</td>
+                        <td>${claim.reasonToClaim}</td>
+                        <td>${formatDate(claim.incidentDate)}</td>
+                        <td>${claim.status}</td>
+                        <td>${claim.remarks || ''}</td>
+                      </tr>`;
+        });
+        table += `</tbody></table>`;
+        document.getElementById('claimsTable').innerHTML = table;
+    })
+    .catch(err => {
+        alert("Error loading claims");
+        console.error(err);
+    });
+}
+
+// Format date to yyyy-mm-dd (handles date string or timestamp)
+function formatDate(dateStr) {
+    if(!dateStr) return '';
+    let d = new Date(dateStr);
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    let year = d.getFullYear();
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+    return [year, month, day].join('-');
+}
+
+function promptUpdate() {
+    let claimId = prompt("Enter Claim ID to Update:");
+    if (claimId) {
+        fetch(`/claims/status/${claimId}`)
+        .then(res => {
+            if (!res.ok) throw new Error('Claim ID not found');
+            return res.json();
+        })
+        .then(data => {
+            // Fill form with data (format date for input)
+            let incidentDate = data.incidentDate ? formatDate(data.incidentDate) : '';
+            document.getElementById('updateFormDiv').innerHTML = `
+                <h5>Update Claim ID: ${claimId}</h5>
+                <form id="updateForm" onsubmit="submitUpdate(event, ${claimId})">
+                    <input type="text" name="name" value="${data.name || ''}" class="form-control my-2" placeholder="Name" required>
+                    <input type="email" name="email" value="${data.email || ''}" class="form-control my-2" placeholder="Email" required>
+                    <input type="text" name="vehicleType" value="${data.vehicleType || ''}" class="form-control my-2" placeholder="Vehicle Type">
+                    <input type="text" name="vehicleNo" value="${data.vehicleNo || ''}" class="form-control my-2" placeholder="Vehicle No">
+                    <input type="text" name="aadhar" value="${data.aadhar || ''}" class="form-control my-2" placeholder="Aadhar">
+                    <input type="text" name="pan" value="${data.pan || ''}" class="form-control my-2" placeholder="PAN">
+                    <input type="text" name="reasonToClaim" value="${data.reasonToClaim || ''}" class="form-control my-2" placeholder="Reason to Claim">
+                    <input type="date" name="incidentDate" value="${incidentDate}" class="form-control my-2" placeholder="Incident Date">
+                    <input type="text" name="status" value="${data.status || ''}" class="form-control my-2" placeholder="Status">
+                    <textarea name="remarks" class="form-control my-2" placeholder="Remarks">${data.remarks || ''}</textarea>
+                    <button type="submit" class="btn btn-success mt-2">Submit Update</button>
+                </form>
+            `;
+        })
+        .catch(error => {
+            alert(error.message);
+            console.error(error);
+            document.getElementById('updateFormDiv').innerHTML = '';
+        });
+    }
+}
+
+function submitUpdate(event, claimId) {
+    event.preventDefault();
+    let form = event.target;
+    let obj = {
+        name: form.name.value,
+        email: form.email.value,
+        vehicleType: form.vehicleType.value,
+        vehicleNo: form.vehicleNo.value,
+        aadhar: form.aadhar.value,
+        pan: form.pan.value,
+        reasonToClaim: form.reasonToClaim.value,
+        incidentDate: form.incidentDate.value,
+        status: form.status.value,
+        remarks: form.remarks.value
+    };
+    fetch(`/claims/update/${claimId}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(obj)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Failed to update claim');
+        return res.json();
+    })
+    .then(data => {
+        alert("Claim updated successfully!");
+        document.getElementById('updateFormDiv').innerHTML = '';
+        loadAllClaims();
+    })
+    .catch(err => {
+        alert("Error updating claim");
+        console.error(err);
+    });
+}
+</script>
+
+</body>
+</html>

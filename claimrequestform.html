@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Claim Request Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 600px;
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        h4 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #343a40;
+            font-weight: 600;
+        }
+        label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .btn-success {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        textarea.form-control {
+            resize: vertical;
+        }
+        #msg {
+            margin-top: 20px;
+            font-weight: 600;
+            text-align: center;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h4>Claim Request Form</h4>
+        <form id="claimForm" onsubmit="return submitForm()" class="mb-3">
+            <label for="policyId">Policy ID</label>
+            <input id="policyId" type="text" name="policyId" class="form-control my-2" required />
+
+            <label for="userId">User ID</label>
+            <input id="userId" type="number" name="userId" class="form-control my-2" />
+
+            <label for="name">Name</label>
+            <input id="name" type="text" name="name" class="form-control my-2" required />
+
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" class="form-control my-2" required />
+
+            <label for="vehicleType">Vehicle Type</label>
+            <input id="vehicleType" type="text" name="vehicleType" class="form-control my-2" required />
+
+            <label for="vehicleNo">Vehicle Number</label>
+            <input id="vehicleNo" type="text" name="vehicleNo" class="form-control my-2" required />
+
+            <label for="aadhar">Aadhar Number</label>
+            <input id="aadhar" type="text" name="aadhar" class="form-control my-2" required />
+
+            <label for="pan">PAN Number</label>
+            <input id="pan" type="text" name="pan" class="form-control my-2" required />
+
+            <label for="reasonToClaim">Reason to Claim</label>
+            <input id="reasonToClaim" type="text" name="reasonToClaim" class="form-control my-2" required />
+
+            <label for="incidentDate">Incident Date</label>
+            <input id="incidentDate" type="date" name="incidentDate" class="form-control my-2" required />
+
+            <label for="description">Description</label>
+            <textarea id="description" name="description" class="form-control my-2" rows="4" required></textarea>
+
+            <button type="submit" class="btn btn-success">Submit Claim</button>
+        </form>
+
+        <div id="msg"></div>
+    </div>
+</body>
+</html>

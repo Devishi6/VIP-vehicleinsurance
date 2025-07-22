@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Registration</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #002b36;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      width: 300px;
+      margin: 100px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    input, button, a {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #00796b;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    a {
+      color: #333;
+      display: block;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Sign Up</h2>
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button onclick="register()">Register</button>
+    <a href="user-login.html">Already have an account? Login</a>
+  </div>
+
+  <script>
+    function register() {
+      const user = {
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+      };
+      fetch("/user/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user)
+      })
+      .then(res => res.text())
+      .then(data => {
+        alert(data);
+        if (data.includes("successfully")) {
+          window.location.href = "user-login.html";
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Registration failed");
+      });
+    }
+  </script>
+</body>
+</html>
